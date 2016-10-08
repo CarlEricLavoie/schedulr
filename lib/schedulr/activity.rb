@@ -1,13 +1,14 @@
 class Activity
   @@count = 0;
+  attr_accessor :id
   def initialize ( name )
-    @id = @@count
+    self.id = @@count
     @@count = @@count+1
     @name = name
   end
 
 
   def to_s
-    "#{@name}::#{@id}"
+    "#{@name}::#{id}"
   end
 end

@@ -6,10 +6,11 @@ module Schedulr
       f.each_line do |line|
         d = line.scan(/\{\{(.*?)\}\}+/)
 
-        puts "calling method #{d[1][0]} with arguments #{d[2][0]}"
+        #todo add debug
+        #puts "calling method #{d[1][0]} with arguments #{d[2][0]}"
 
         #convert string to array
-        args = d[2][0].gsub(/(\[\"|\"\])/, '').split('", "')
+        args = d[2][0].gsub(/(\[\"?|\"?\])/, '').split('", "')
 
         #use splat operator to reconstruct function call
         send(d[1][0], *args, false)
@@ -33,19 +34,22 @@ module Schedulr
     @activities << Activity.new( activity )
   end
 
-  def self.print( quiet, motif, lignes )
-    # A COMPLETER.#
-    return [] if lignes == []
+  def self.list()
+    puts @activities
   end
-  def self.substitute( quiet, motif, remplacement, global, lignes )
-    return [] if quiet
 
-    lignes.map do |ligne|
-      if /#{motif}/ =~ ligne
-        ligne.send (global ? :gsub : :sub), /#{motif}/, remplacement
-      else
-        ligne
-      end
+  def self.get ( activity_id )
+    @activities.select do |activity|
+      activity.id == activity_id
+    end
+  end
+
+  def self.remove( activity_id, save )
+    activity_id = activity_id.to_i
+
+    save ( "remove", [activity_id]) if save
+    @activities.delete_if do |activity|
+      activity.id == activity_id
     end
   end
 end

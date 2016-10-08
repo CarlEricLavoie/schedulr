@@ -54,8 +54,14 @@ command :add do |c|
   end
 end
 
+arg_name '[activity_id]'
 desc 'Removes and activity from the list of activities'
 command :remove do |c|
+  c.action do |global_options, options, args|
+
+    activity_id = args.shift.to_i
+    Schedulr.remove( activity_id, true )
+  end
 end
 
 desc 'Edits an activity name'
@@ -72,6 +78,9 @@ end
 
 desc 'Lists all activities'
 command :list do |c|
+  c.action do |global_options, options, args|
+    Schedulr.list()
+  end
 end
 
 desc 'Displays the schedule for a given day'
