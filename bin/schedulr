@@ -64,16 +64,32 @@ command :remove do |c|
   end
 end
 
+arg_name '[activity_id] [activity_name]'
 desc 'Edits an activity name'
 command :rename do |c|
+  c.action do |global_options, options, args|
+
+    activity_id = args.shift.to_i
+    activity_name = args.shift
+    Schedulr.rename( activity_id, activity_name, true )
+  end
 end
 
 desc 'Displays the current activity'
 command :current do |c|
+  c.action do |global_options, options, args|
+    Schedulr.current( )
+  end
 end
 
+arg_name '[activity_id]'
 desc 'Sets the current activity'
 command :set do |c|
+  c.action do |global_options, options, args|
+
+    activity_id = args.shift.to_i
+    Schedulr.set( activity_id, true )
+  end
 end
 
 desc 'Lists all activities'
