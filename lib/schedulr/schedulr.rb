@@ -1,3 +1,5 @@
+require 'schedulr/log_entry'
+
 module Schedulr
 
   attr_accessor :time_now
@@ -7,22 +9,32 @@ module Schedulr
     open(name, 'a')
     open(name, 'r+') do |f|
       f.each_line do |line|
-        d = line.scan(/\{\{(.*?)\}\}+/)
-
-        #todo add debug
-        #puts "calling method #{d[1][0]} with arguments #{d[2][0]}"
-        @time_now = Proc.new { Time.at(d[0][0].to_i) }
-        puts @time_now.call
-        #convert string to array
-        args = d[2][0].gsub(/(\[\"?|\"?\])/, '').split(/"?, "?/)
-
-        #todo int as int not string
-
-        #use splat operator to reconstruct function call
-        send(d[1][0], *args, false)
+        load_line(line)
       end
     end
     nil
+  end
+
+  def self.load_between(name, t_begin, t_end)
+    @name = name
+    @activities = []
+
+    open(name, 'a')
+    open(name, 'r+') do |f|
+      f.each_line do |line|
+        log = LogEntry.from(line)
+
+        load_line line if log.date > t_begin && log.date < t_end
+      end
+    end
+    nil
+  end
+
+  def self.load_line(line)
+    log = LogEntry.from(line)
+
+    @time_now = Proc.new { log.date }
+    send(log.cmd, *log.args, false)
   end
 
   def self.rename(activity_id, activity_name, save)
@@ -51,22 +63,41 @@ module Schedulr
     puts @activities
   end
 
+  def self.day(name)
+    now = Time.now
+    d_end = Time.new(now.year, now.month, now.day)
+    d_begin = Time.new(now.year-200, now.month, now.day)
+    @current_day = Day.new(d_end)
+    load_between(name, d_begin, d_end)
+
+    d_begin = d_end
+    d_end += (24*60*60)
+    @current_day = Day.new(d_begin)
+    load_between(name, d_begin, d_end)
+    @current_day.p_print if @current_day
+  end
+
   def self.get (activity_id)
     activity_id = activity_id.to_i
     @activities.find do |activity|
       activity.id == activity_id
     end
   end
-  
+
   def self.computeTime()
-    puts (@time_now.call - @latest_timestamp).to_i
-    @current.time += (@time_now.call - @latest_timestamp).to_i if !@current.nil? and @timer_running
+    if !@current.nil?
+      event = Event.new
+      event.startTime = Time.at(@latest_timestamp)
+      event.endTime = @time_now.call
+      event.activity = @current
+      @current_day.events << event
+    end
     @latest_timestamp = @time_now.call
   end
 
   def self.start(save)
     save("start", []) if save
-    @timer_running = true
+    @timer_running = true if !@current.nil?
     @latest_timestamp = @time_now.call
   end
 
