@@ -1,4 +1,7 @@
 module Schedulr
+
+  attr_accessor :time_now
+
   def self.load(name)
     @name = name
     open(name, 'a')
@@ -8,7 +11,8 @@ module Schedulr
 
         #todo add debug
         #puts "calling method #{d[1][0]} with arguments #{d[2][0]}"
-
+        @time_now = Proc.new { Time.at(d[0][0].to_i) }
+        puts @time_now.call
         #convert string to array
         args = d[2][0].gsub(/(\[\"?|\"?\])/, '').split(/"?, "?/)
 
@@ -53,6 +57,25 @@ module Schedulr
       activity.id == activity_id
     end
   end
+  
+  def self.computeTime()
+    puts (@time_now.call - @latest_timestamp).to_i
+    @current.time += (@time_now.call - @latest_timestamp).to_i if !@current.nil? and @timer_running
+    @latest_timestamp = @time_now.call
+  end
+
+  def self.start(save)
+    save("start", []) if save
+    @timer_running = true
+    @latest_timestamp = @time_now.call
+  end
+
+  def self.stop(save)
+    save("stop", []) if save
+    computeTime()
+    # puts @time_now.call - @latest_timestamp if @timer_running
+    @timer_running = false
+  end
 
   def self.current()
     puts @current
@@ -60,6 +83,7 @@ module Schedulr
 
   def self.set (activity_id, save)
     save("set", [activity_id]) if save
+    computeTime()
     @current = get(activity_id)
   end
 
