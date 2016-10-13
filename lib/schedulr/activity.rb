@@ -12,6 +12,6 @@ class Activity
 
 
   def to_s
-    "#{name}::#{id}::#{time}"
+    "#{name}::#{id}"
   end
 end
