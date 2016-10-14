@@ -2,7 +2,7 @@ require 'schedulr/log_entry'
 
 module Schedulr
 
-  attr_accessor :time_now
+  @time_now = Proc.new { Time.now }
 
   def self.load(name)
     @name = name
@@ -56,11 +56,14 @@ module Schedulr
   def self.add(activity, save)
     save ("add", [activity]) if save
     @activities = Array.new if @activities.nil?
-    @activities << Activity.new(activity)
+    activity = Activity.new(activity)
+    @activities << activity
+    return activity
   end
 
   def self.list()
-    puts @activities
+    @activities = Array.new if @activities.nil?
+    @activities
   end
 
   def self.day(name)
@@ -109,7 +112,7 @@ module Schedulr
   end
 
   def self.current()
-    puts @current
+    @current
   end
 
   def self.set (activity_id, save)

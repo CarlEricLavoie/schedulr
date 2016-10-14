@@ -76,7 +76,7 @@ end
 desc 'Displays the current activity'
 command :current do |c|
   c.action do |global_options, options, args|
-    Schedulr.current( )
+    puts Schedulr.current( )
   end
 end
 
@@ -93,7 +93,7 @@ end
 desc 'Lists all activities'
 command :list do |c|
   c.action do |global_options, options, args|
-    Schedulr.list()
+    puts Schedulr.list()
   end
 end
 
@@ -103,7 +103,7 @@ command :day do |c|
     Schedulr.day(global_options[:file])
   end
 end
-
+#MODIFY DISPLAY TO SHOW DAY OR WEEK DEPENDING ON FALG
 desc 'Displays the schedule for a given week split by day'
 command :week do |c|
 end
