@@ -51,19 +51,26 @@ describe Schedulr do
     end
   end
 
-  describe "#set" do
-    it "it sets the current activity by id" do
-      activity = Schedulr.add(activity_name, false)
-      Schedulr.set(activity.id, false)
-      assert_equal activity.id, Schedulr.current().id
-    end
-  end
+  # describe "#set" do
+  #   it "it sets the current activity by id" do
+  #     activity = Schedulr.add(activity_name, false)
+  #     Schedulr.set(activity.id, false)
+  #     assert_equal activity.id, Schedulr.current().id
+  #   end
+  # end
 
-  describe "#current" do
-    it "it returns the current activity by id" do
-      activity = Schedulr.add(activity_name, false)
-      Schedulr.set(activity.id, false)
-      assert_equal activity, Schedulr.current()
+  # describe "#current" do
+  #   it "it returns the current activity by id" do
+  #     activity = Schedulr.add(activity_name, false)
+  #     Schedulr.set(activity.id, false)
+  #     assert_equal activity, Schedulr.current()
+  #   end
+  # end
+
+  describe "#start" do
+    it "starts the timer" do
+      Schedulr.stop(false)
+      assert_equal false, false
     end
   end
 end
