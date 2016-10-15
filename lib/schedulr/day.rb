@@ -12,9 +12,13 @@ class Day
     end
   end
 
+  def addEvent(event)
+    @events << event
+  end
+
   def initialize(time)
     @events = []
     @name = time.strftime("%A, %d/%m/%Y")
-    @time = time
+    @time = Time.new(time.year, time.month, time.day)
   end
 end

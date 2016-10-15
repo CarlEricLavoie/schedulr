@@ -1,8 +1,10 @@
 require 'schedulr/log_entry'
+require 'schedulr/calendar'
 
 module Schedulr
 
   @time_now = Proc.new { Time.now }
+  @calendar = Calendar.new
 
   def self.load(name)
     @name = name
@@ -15,24 +17,8 @@ module Schedulr
     nil
   end
 
-  def self.load_between(name, t_begin, t_end)
-    @name = name
-    @activities = []
-
-    open(name, 'a')
-    open(name, 'r+') do |f|
-      f.each_line do |line|
-        log = LogEntry.from(line)
-
-        load_line line if log.date > t_begin && log.date < t_end
-      end
-    end
-    nil
-  end
-
   def self.load_line(line)
     log = LogEntry.from(line)
-
     @time_now = Proc.new { log.date }
     send(log.cmd, *log.args, false)
   end
@@ -69,15 +55,7 @@ module Schedulr
   def self.day(name)
     now = Time.now
     d_end = Time.new(now.year, now.month, now.day)
-    d_begin = Time.new(now.year-200, now.month, now.day)
-    @current_day = Day.new(d_end)
-    load_between(name, d_begin, d_end)
-
-    d_begin = d_end
-    d_end += (24*60*60)
-    @current_day = Day.new(d_begin)
-    load_between(name, d_begin, d_end)
-    @current_day.p_print if @current_day
+    @calendar.getDay(d_end)
   end
 
   def self.get (activity_id)
@@ -89,14 +67,13 @@ module Schedulr
 
   def self.computeTime()
     if !@current.nil?
-      event = Event.new
-      event.startTime = Time.at(@latest_timestamp)
-      event.endTime = @time_now.call
-      event.activity = @current
-      @current_day.events << event
+      @calendar.event(Time.at(@latest_timestamp), @time_now.call, @current)
     end
     @latest_timestamp = @time_now.call
   end
+
+  #Adds an event to the right day
+
 
   def self.start(save)
     save("start", []) if save
@@ -105,9 +82,9 @@ module Schedulr
   end
 
   def self.stop(save)
+    @temp =true
     save("stop", []) if save
     computeTime()
-    # puts @time_now.call - @latest_timestamp if @timer_running
     @timer_running = false
   end
 
