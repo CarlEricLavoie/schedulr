@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'gli'
 begin # XXX: Remove this begin/rescue before distributing your app
-require 'schedulr'
+  require 'schedulr'
 rescue LoadError
   STDERR.puts "In development, you need to use `bundle exec bin/schedulr` to run your app"
   STDERR.puts "At install-time, RubyGems will make sure lib, etc. are in the load path"
@@ -22,17 +22,12 @@ arguments :strict
 # switch [:s,:switch]
 
 desc 'This flag allows to apply commands on a specific instance of shedulr rather than on the default one.'
-default_value 'default'
+default_value 'schedulr'
 arg_name 'instance name'
-flag [:i,:instance]
+flag [:i, :instance]
 
-desc 'This flag allows to export timesheet to a specific file.'
-default_value 'shedulr.timesheet'
-arg_name 'file name'
-flag [:f,:file]
-
-pre do |global,command,options,args|
-  Schedulr.load(global[:file])
+pre do |global, command, options, args|
+  Schedulr.load(global[:i]+'.timesheet')
   # Pre logic here
   # Return true to proceed; false to abort and not call the
   # chosen command
@@ -48,7 +43,7 @@ command :add do |c|
 
   c.action do |global_options, options, args|
     activity = args.shift
-    Schedulr.add( activity, true )
+    Schedulr.add(activity, true)
   end
 end
 
@@ -58,7 +53,7 @@ command :remove do |c|
   c.action do |global_options, options, args|
 
     activity_id = args.shift.to_i
-    Schedulr.remove( activity_id, true )
+    Schedulr.remove(activity_id, true)
   end
 end
 
@@ -69,24 +64,24 @@ command :rename do |c|
 
     activity_id = args.shift.to_i
     activity_name = args.shift
-    Schedulr.rename( activity_id, activity_name, true )
+    Schedulr.rename(activity_id, activity_name, true)
   end
 end
 
 desc 'Displays the current activity'
 command :current do |c|
   c.action do |global_options, options, args|
-    puts Schedulr.current( )
+    puts Schedulr.current()
   end
 end
 
-arg_name '[activity_id]'
+arg_name 'activity_id'
 desc 'Sets the current activity'
 command :set do |c|
   c.action do |global_options, options, args|
 
     activity_id = args.shift.to_i
-    Schedulr.set( activity_id, true )
+    Schedulr.set(activity_id, true)
   end
 end
 
@@ -98,10 +93,20 @@ command :list do |c|
 end
 
 desc 'Displays the schedule for a given day'
-command :day do |c|
+command :display do |c|
+  c.flag [:off, :offset], :desc => "Number of days to offset", :type => Integer, :default_value => 0
+  c.switch [:w, :week], :desc => "Displays weekly schedule", :default_value => false
   c.action do |global_options, options, args|
-    day = Schedulr.day(global_options[:file])
-    day.p_print if !day.nil?
+    display_week = options["week"]
+    end_day = options["offset"]
+    start_day = end_day + 1
+    start_day = end_day + 7 if display_week
+
+    while start_day > end_day do
+      start_day -=1
+      day = Schedulr.day(start_day)
+      day.p_print
+    end
   end
 end
 #MODIFY DISPLAY TO SHOW DAY OR WEEK DEPENDING ON FALG
@@ -124,7 +129,7 @@ command :stop do |c|
 end
 
 
-post do |global,command,options,args|
+post do |global, command, options, args|
   # Post logic here
   # Use skips_post before a command to skip this
   # block on that command only

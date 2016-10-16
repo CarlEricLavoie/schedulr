@@ -1,13 +1,25 @@
 require 'schedulr/log_entry'
 require 'schedulr/calendar'
+require 'schedulr/activity'
 
 module Schedulr
 
+  # proc used to get current time. Will be changed when reconstructing app state
   @time_now = Proc.new { Time.now }
+  #calendar object
   @calendar = Calendar.new
+  #name of the instance to load
+  @instance_name = nil
+  #list of all activities
+  @activities = Array.new
+  #current activity
+  @current_activity = nil
+  #timestamp of the latest event. used to calculate time diff between events.
+  @latest_timestamp = nil
+
 
   def self.load(name)
-    @name = name
+    @instance_name = name
     open(name, 'a')
     open(name, 'r+') do |f|
       f.each_line do |line|
@@ -34,27 +46,29 @@ module Schedulr
   end
 
   def self.save(command, args)
-    open(@name, 'a') do |f|
-      f.puts "{{#{Time.now.to_i}}}{{#{command}}}{{#{args}}}"
+    log_entry = LogEntry.new(Time.now.to_i, command, args)
+    open(@instance_name, 'a') do |f|
+      f.puts log_entry.toLog
     end
   end
 
   def self.add(activity, save)
     save ("add", [activity]) if save
-    @activities = Array.new if @activities.nil?
     activity = Activity.new(activity)
     @activities << activity
     return activity
   end
 
   def self.list()
-    @activities = Array.new if @activities.nil?
     @activities
   end
 
-  def self.day(name)
+  def self.day(offset)
+    @time_now = Proc.new { Time.now }
+    stop(false) if @timer_running
     now = Time.now
     d_end = Time.new(now.year, now.month, now.day)
+    d_end = d_end - (1*24*60*60*offset.to_i)
     @calendar.getDay(d_end)
   end
 
@@ -66,8 +80,8 @@ module Schedulr
   end
 
   def self.computeTime()
-    if !@current.nil?
-      @calendar.event(Time.at(@latest_timestamp), @time_now.call, @current)
+    if !@current_activity.nil?
+      @calendar.event(Time.at(@latest_timestamp), @time_now.call, @current_activity)
     end
     @latest_timestamp = @time_now.call
   end
@@ -77,7 +91,7 @@ module Schedulr
 
   def self.start(save)
     save("start", []) if save
-    @timer_running = true if !@current.nil?
+    @timer_running = true if !@current_activity.nil?
     @latest_timestamp = @time_now.call
   end
 
@@ -89,13 +103,13 @@ module Schedulr
   end
 
   def self.current()
-    @current
+    @current_activity
   end
 
   def self.set (activity_id, save)
     save("set", [activity_id]) if save
     computeTime()
-    @current = get(activity_id)
+    @current_activity = get(activity_id)
   end
 
   def self.remove(activity_id, save)

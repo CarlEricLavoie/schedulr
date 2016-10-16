@@ -17,7 +17,8 @@ class Calendar
   end
 
   def getDay(time)
-    @days.find {|x| x.time == time}
+    day = @days.find {|x| x.time == time}
+    if day then day else Day.new(time) end
   end
 
   def initialize
