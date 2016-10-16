@@ -6,10 +6,11 @@ class Event
   attr_accessor :activity
 
   def p_print
+    p_puts "", '.'
     p_puts ""
-    p_puts "start:#{startTime.strftime("%H:%M:%S")}"
-    p_puts "end:#{endTime.strftime("%H:%M:%S")}"
-    p_puts "activity:#{activity.name}"
+    p_puts "#{activity.name.capitalize}"
+    p_puts "from #{startTime.strftime("%H:%M")} to #{endTime.strftime("%H:%M")}"
+    p_puts ""
   end
 
   def initialize(startTime, endTime, activity)

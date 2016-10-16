@@ -1,3 +1,4 @@
+
 class LogEntry
   attr_accessor :date
   attr_accessor :cmd
