@@ -14,10 +14,6 @@ class LogEntry
     @args = args
   end
 
-  def self.exec()
-    puts "test"
-    # send(@cmd, *@args, @cmd)
-  end
 end
 
 def LogEntry.from(line)
