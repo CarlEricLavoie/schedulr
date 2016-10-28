@@ -60,7 +60,6 @@ describe Schedulr do
 
       Schedulr.set(activity_1.id, false)
       assert_equal activity_1.id, Schedulr.current().id
-
       refute_equal activity_1.id, activity_2.id
     end
   end
@@ -69,7 +68,7 @@ describe Schedulr do
   #   it "it returns the current activity by id" do
   #     activity = Schedulr.add(activity_name, false)
   #     Schedulr.set(activity.id, false)
-  #     assert_equal activity, Schedulr.current()
+  #     refute_equal activity, Schedulr.current()
   #   end
   # end
 
