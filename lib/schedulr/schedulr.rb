@@ -5,7 +5,7 @@ require 'schedulr/activity'
 module Schedulr
 
   # proc used to get current time. Will be changed when reconstructing app state
-  @time_now = Proc.new { Time.now }
+  @time_now = Time.now
   #calendar object
   @calendar = Calendar.new
   #name of the instance to load
@@ -31,7 +31,7 @@ module Schedulr
 
   def self.load_line(line)
     log = LogEntry.from(line)
-    @time_now = Proc.new { log.date }
+    @time_now = log.date
     send(log.cmd, *log.args, false)
   end
 
@@ -64,7 +64,7 @@ module Schedulr
   end
 
   def self.day(offset)
-    @time_now = Proc.new { Time.now }
+    @time_now = Time.now
     stop(false) if @timer_running
     now = Time.now
     d_end = Time.new(now.year, now.month, now.day)
@@ -81,9 +81,9 @@ module Schedulr
 
   def self.computeTime()
     if !@current_activity.nil?
-      @calendar.event(Time.at(@latest_timestamp), @time_now.call, @current_activity)
+      @calendar.event(Time.at(@latest_timestamp), @time_now, @current_activity)
     end
-    @latest_timestamp = @time_now.call
+    @latest_timestamp = @time_now
   end
 
   #Adds an event to the right day
@@ -92,7 +92,7 @@ module Schedulr
   def self.start(save)
     save("start", []) if save
     @timer_running = true if !@current_activity.nil?
-    @latest_timestamp = @time_now.call
+    @latest_timestamp = @time_now
   end
 
   def self.stop(save)
