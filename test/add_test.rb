@@ -51,13 +51,19 @@ describe Schedulr do
     end
   end
 
-  # describe "#set" do
-  #   it "it sets the current activity by id" do
-  #     activity = Schedulr.add(activity_name, false)
-  #     Schedulr.set(activity.id, false)
-  #     assert_equal activity.id, Schedulr.current().id
-  #   end
-  # end
+  describe "#set" do
+    it "it sets the current activity by id" do
+      activity_1 = Schedulr.add(activity_name, false)
+      activity_2 = Schedulr.add(activity_name, false)
+      Schedulr.set(activity_2.id, false)
+      assert_equal activity_2.id, Schedulr.current().id
+
+      Schedulr.set(activity_1.id, false)
+      assert_equal activity_1.id, Schedulr.current().id
+
+      refute_equal activity_1.id, activity_2.id
+    end
+  end
 
   # describe "#current" do
   #   it "it returns the current activity by id" do
