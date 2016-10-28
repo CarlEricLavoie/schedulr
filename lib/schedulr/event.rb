@@ -1,17 +1,7 @@
-require 'schedulr/pretty_print'
-
 class Event
   attr_accessor :startTime
   attr_accessor :endTime
   attr_accessor :activity
-
-  def p_print
-    p_puts "", '.'
-    p_puts ""
-    p_puts "#{activity.name.capitalize}"
-    p_puts "from #{startTime.strftime("%H:%M")} to #{endTime.strftime("%H:%M")}"
-    p_puts ""
-  end
 
   def initialize(startTime, endTime, activity)
     @startTime = startTime

@@ -105,13 +105,17 @@ command :display do |c|
     while start_day > end_day do
       start_day -=1
       day = Schedulr.day(start_day)
-      day.p_print
+      p_puts "", '-'
+      p_puts day.name
+      day.events.each do |event|
+        p_puts "", '.'
+        p_puts ""
+        p_puts event.activity.name.capitalize
+        p_puts "from #{event.startTime.strftime("%H:%M")} to #{event.endTime.strftime("%H:%M")}"
+        p_puts ""
+      end
     end
   end
-end
-#MODIFY DISPLAY TO SHOW DAY OR WEEK DEPENDING ON FALG
-desc 'Displays the schedule for a given week split by day'
-command :week do |c|
 end
 
 desc 'Starts the timer'
