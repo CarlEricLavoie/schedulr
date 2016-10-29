@@ -23,9 +23,9 @@ module Schedulr
 
   def self.load(name)
     initialize_state()
-    @instance_name = name
-    open(name, 'a')
-    open(name, 'r+') do |f|
+    @instance_name = "#{name}.timesheet"
+    open(@instance_name, 'a')
+    open(@instance_name, 'r+') do |f|
       f.each_line do |line|
         load_line(line)
       end
