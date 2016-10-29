@@ -4,19 +4,6 @@ require 'schedulr/activity'
 
 module Schedulr
 
-
-  def self.load(name)
-    initialize_state()
-    @instance_name = name
-    open(name, 'a')
-    open(name, 'r+') do |f|
-      f.each_line do |line|
-        load_line(line)
-      end
-    end
-    nil
-  end
-
   def self.initialize_state()
     # proc used to get current time. Will be changed when reconstructing app state
     @time_now = Time.now
@@ -31,6 +18,19 @@ module Schedulr
     #timestamp of the latest event. used to calculate time diff between events.
     @latest_timestamp = nil
   end
+
+  def self.load(name)
+    initialize_state()
+    @instance_name = name
+    open(name, 'a')
+    open(name, 'r+') do |f|
+      f.each_line do |line|
+        load_line(line)
+      end
+    end
+    nil
+  end
+
 
   def self.load_line(line)
     log = LogEntry.from(line)

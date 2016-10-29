@@ -82,7 +82,17 @@ describe Schedulr do
       assert_equal false, false
     end
   end
-  
+
+  describe "#rename" do
+    let(:test_activity_name) {"test_name"}
+
+    it "changes the name of an activity by id" do
+      activity = Schedulr.add(@activity_name)
+      Schedulr.rename(activity.id, test_activity_name)
+      assert_equal test_activity_name, activity.name
+    end
+  end
+
 
   describe "#load" do
 
