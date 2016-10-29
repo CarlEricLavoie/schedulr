@@ -17,6 +17,8 @@ module Schedulr
     @current_activity = nil
     #timestamp of the latest event. used to calculate time diff between events.
     @latest_timestamp = nil
+    #Identifies if the timer is currently running
+    @timer_running = false
   end
 
   def self.load(name)
@@ -66,7 +68,7 @@ module Schedulr
     @activities
   end
 
-  def self.day(offset)
+  def self.day(offset = 0)
     @time_now = Time.now
     stop(false) if @timer_running
     now = Time.now
@@ -99,7 +101,6 @@ module Schedulr
   end
 
   def self.stop(save = true)
-    @temp =true
     save("stop", []) if save
     computeTime()
     @timer_running = false
