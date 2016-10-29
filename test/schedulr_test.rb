@@ -148,6 +148,24 @@ describe Schedulr do
     end
   end
 
+  describe "#list" do
+    it "lists returns a list of Activities" do
+      Schedulr.add(@activity_name)
+      assert Schedulr.list().kind_of?(Array)
+      assert Schedulr.list()[0].kind_of?(Activity)
+    end
+
+    it "returns the right activities" do
+      activity = Schedulr.add(@activity_name)
+      assert_equal activity.id, Schedulr.list()[0].id
+    end
+
+    it "returns an empty list if there are no activities" do
+      assert_equal 0, Schedulr.list().length
+      assert Schedulr.list().kind_of?(Array)
+    end
+  end
+
 
   describe "#load" do
 
