@@ -43,7 +43,7 @@ command :add do |c|
 
   c.action do |global_options, options, args|
     activity = args.shift
-    Schedulr.add(activity, true)
+    Schedulr.add(activity)
   end
 end
 
@@ -53,7 +53,7 @@ command :remove do |c|
   c.action do |global_options, options, args|
 
     activity_id = args.shift.to_i
-    Schedulr.remove(activity_id, true)
+    Schedulr.remove(activity_id)
   end
 end
 
@@ -64,7 +64,7 @@ command :rename do |c|
 
     activity_id = args.shift.to_i
     activity_name = args.shift
-    Schedulr.rename(activity_id, activity_name, true)
+    Schedulr.rename(activity_id, activity_name)
   end
 end
 
@@ -81,7 +81,7 @@ command :set do |c|
   c.action do |global_options, options, args|
 
     activity_id = args.shift.to_i
-    Schedulr.set(activity_id, true)
+    Schedulr.set(activity_id)
   end
 end
 
@@ -121,14 +121,14 @@ end
 desc 'Starts the timer'
 command :start do |c|
   c.action do |global_options, options, args|
-    Schedulr.start(true)
+    Schedulr.start()
   end
 end
 
 desc 'Stops the timer'
 command :stop do |c|
   c.action do |global_options, options, args|
-    Schedulr.stop(true)
+    Schedulr.stop()
   end
 end
 
