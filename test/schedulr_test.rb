@@ -10,6 +10,9 @@ describe Schedulr do
     # Randomly generate the activity name for each test.
     # This will ensure tests are not sharing activity names by mistake
     @activity_name = SecureRandom.uuid
+
+    @function_call_mock = MiniTest::Mock.new
+    @function_call_mock.expect(:call, nil, [Object, Object])
   end
 
   after do
@@ -35,6 +38,13 @@ describe Schedulr do
       assert_equal initial_length+2, Schedulr.list().length
     end
 
+    it "is persisted" do
+      Schedulr.stub :save, @function_call_mock do
+        Schedulr.add(@activity_name)
+      end
+      @function_call_mock.verify
+    end
+
   end
 
   describe "#remove" do
@@ -53,6 +63,14 @@ describe Schedulr do
       Schedulr.remove(activity.id, false)
       assert_equal initial_length-1, Schedulr.list().length
     end
+
+    it "is persisted" do
+      activity = Schedulr.add(@activity_name)
+      Schedulr.stub :save, @function_call_mock do
+        Schedulr.remove(activity.id)
+      end
+      @function_call_mock.verify
+    end
   end
 
   describe "#set" do
@@ -66,6 +84,14 @@ describe Schedulr do
       assert_equal activity_1.id, Schedulr.current().id
       refute_equal activity_1.id, activity_2.id
     end
+
+    it "is persisted" do
+      activity = Schedulr.add(@activity_name)
+      Schedulr.stub :save, @function_call_mock do
+        Schedulr.set(activity.id)
+      end
+      @function_call_mock.verify
+    end
   end
 
   # describe "#current" do
@@ -78,8 +104,29 @@ describe Schedulr do
 
   describe "#start" do
     it "starts the timer" do
+      Schedulr.stop()
+      assert_equal false, false
+    end
+
+    it "is persisted" do
+      Schedulr.stub :save, @function_call_mock do
+        Schedulr.start()
+      end
+      @function_call_mock.verify
+    end
+  end
+
+  describe "#start" do
+    it "stops the timer" do
       Schedulr.stop(false)
       assert_equal false, false
+    end
+
+    it "is persisted" do
+      Schedulr.stub :save, @function_call_mock do
+        Schedulr.start()
+      end
+      @function_call_mock.verify
     end
   end
 
@@ -90,6 +137,14 @@ describe Schedulr do
       activity = Schedulr.add(@activity_name)
       Schedulr.rename(activity.id, test_activity_name)
       assert_equal test_activity_name, activity.name
+    end
+
+    it "is persisted" do
+      activity = Schedulr.add(@activity_name)
+      Schedulr.stub :save, @function_call_mock do
+        Schedulr.rename(activity.id, test_activity_name)
+      end
+      @function_call_mock.verify
     end
   end
 
