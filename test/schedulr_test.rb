@@ -3,10 +3,24 @@ require 'schedulr'
 require 'securerandom'
 
 describe Schedulr do
-  # let(:activity_name) { "coding" }
+  let(:random_day_offset) do
+    1 + rand(200)
+  end
+
+  let(:start_time) do
+    now = Time.now
+    Time.new(now.year, now.month, now.day, 6, 00, 00) - (60*60*24*random_day_offset)
+  end
+
+  let(:end_time) do
+    now = Time.now
+    Time.new(now.year, now.month, now.day, 10, 30, 00) - (60*60*24*random_day_offset)
+  end
+
+  let(:schedulr_instance) { "test" }
 
   before do
-    Schedulr.load("test.timesheet")
+    Schedulr.load(schedulr_instance)
     # Randomly generate the activity name for each test.
     # This will ensure tests are not sharing activity names by mistake
     @activity_name = SecureRandom.uuid
@@ -16,7 +30,7 @@ describe Schedulr do
   end
 
   after do
-    File.delete("test.timesheet")
+    File.delete("#{schedulr_instance}.timesheet")
   end
 
   describe "#add" do
@@ -73,6 +87,36 @@ describe Schedulr do
     end
   end
 
+  describe "#day" do
+    it "returns an empty Day when no activites registered" do
+      assert_equal 0, Schedulr.day().events.length
+    end
+
+    it "returns a Day with 1 event if there were one event today" do
+      activity = Schedulr.add(@activity_name)
+      Schedulr.set(activity.id)
+      Schedulr.start()
+      assert_equal 1, Schedulr.day().events.length
+    end
+
+    it "returns the proper day schedule when using the offset" do
+      Time.stub :now, start_time do
+        puts "event start day #{start_time}"
+        Schedulr.load(schedulr_instance)
+        activity = Schedulr.add(@activity_name)
+        Schedulr.set(activity.id)
+        Schedulr.start()
+      end
+
+      Time.stub :now, end_time do
+        Schedulr.stop()
+      end
+
+      refute Schedulr.day().events.any?
+      assert Schedulr.day(random_day_offset).events.any?
+    end
+  end
+
   describe "#set" do
     it "it sets the current activity by id" do
       activity_1 = Schedulr.add(@activity_name, false)
@@ -94,20 +138,7 @@ describe Schedulr do
     end
   end
 
-  # describe "#current" do
-  #   it "it returns the current activity by id" do
-  #     activity = Schedulr.add(activity_name, false)
-  #     Schedulr.set(activity.id, false)
-  #     refute_equal activity, Schedulr.current()
-  #   end
-  # end
-
   describe "#start" do
-    it "starts the timer" do
-      Schedulr.stop()
-      assert_equal false, false
-    end
-
     it "is persisted" do
       Schedulr.stub :save, @function_call_mock do
         Schedulr.start()
@@ -116,12 +147,7 @@ describe Schedulr do
     end
   end
 
-  describe "#start" do
-    it "stops the timer" do
-      Schedulr.stop(false)
-      assert_equal false, false
-    end
-
+  describe "#stop" do
     it "is persisted" do
       Schedulr.stub :save, @function_call_mock do
         Schedulr.start()
@@ -131,7 +157,7 @@ describe Schedulr do
   end
 
   describe "#rename" do
-    let(:test_activity_name) {"test_name"}
+    let(:test_activity_name) { "test_name" }
 
     it "changes the name of an activity by id" do
       activity = Schedulr.add(@activity_name)
@@ -169,20 +195,20 @@ describe Schedulr do
 
   describe "#load" do
 
-    let(:path_to_test_file) { "test/load_test.timesheet" }
-    let(:path_to_test_file_2) { "test/load_test_2.timesheet" }
+    let(:path_to_test_file) { "load_test" }
+    let(:path_to_test_file_2) { "load_test_2" }
 
     before do
       # Load Schedulr in an empty state
-      File.delete(path_to_test_file) if File.exist?(path_to_test_file)
-      File.delete(path_to_test_file_2) if File.exist?(path_to_test_file_2)
+      File.delete("#{path_to_test_file}.timesheet") if File.exist?("#{path_to_test_file}.timesheet")
+      File.delete("#{path_to_test_file_2}.timesheet") if File.exist?("#{path_to_test_file_2}.timesheet")
       Schedulr.load(path_to_test_file)
     end
 
     after do
       # Delete test files
-      File.delete(path_to_test_file) if File.exist?(path_to_test_file)
-      File.delete(path_to_test_file_2) if File.exist?(path_to_test_file_2)
+      File.delete("#{path_to_test_file}.timesheet") if File.exist?("#{path_to_test_file}.timesheet")
+      File.delete("#{path_to_test_file_2}.timesheet") if File.exist?("#{path_to_test_file_2}.timesheet")
     end
 
     it "cleans previous state" do
@@ -200,7 +226,7 @@ describe Schedulr do
       activity = Schedulr.add(@activity_name)
       assert_equal 1, Schedulr.list().length
 
-      FileUtils.cp path_to_test_file, path_to_test_file_2
+      FileUtils.cp "#{path_to_test_file}.timesheet", "#{path_to_test_file_2}.timesheet"
 
       Schedulr.remove(activity.id)
       assert_equal 0, Schedulr.list().length
