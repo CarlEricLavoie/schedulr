@@ -3,7 +3,7 @@ class Day
   attr_accessor :name
   attr_accessor :events
 
-  def addEvent(event)
+  def add_event(event)
     @events << event
   end
 

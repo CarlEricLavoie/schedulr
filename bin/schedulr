@@ -97,23 +97,17 @@ command :display do |c|
   c.flag [:off, :offset], :desc => "Number of days to offset", :type => Integer, :default_value => 0
   c.switch [:w, :week], :desc => "Displays weekly schedule", :default_value => false
   c.action do |global_options, options, args|
-    display_week = options["week"]
     end_day = options["offset"]
-    start_day = end_day + 1
-    start_day = end_day + 7 if display_week
+
+    if options["week"]
+      start_day = end_day + 7
+    else
+      start_day = end_day + 1
+    end
 
     while start_day > end_day do
       start_day -=1
-      day = Schedulr.day(start_day)
-      p_puts "", '-'
-      p_puts day.name
-      day.events.each do |event|
-        p_puts "", '.'
-        p_puts ""
-        p_puts event.activity.name.capitalize
-        p_puts "from #{event.startTime.strftime("%H:%M")} to #{event.endTime.strftime("%H:%M")}"
-        p_puts ""
-      end
+      display_day Schedulr.day(start_day)
     end
   end
 end
@@ -129,6 +123,18 @@ desc 'Stops the timer'
 command :stop do |c|
   c.action do |global_options, options, args|
     Schedulr.stop()
+  end
+end
+
+def display_day (name)
+  p_puts "", '-'
+  p_puts day.name
+  day.events.each do |event|
+    p_puts "", '.'
+    p_puts ""
+    p_puts event.activity.name.capitalize
+    p_puts "from #{event.startTime.strftime("%H:%M")} to #{event.endTime.strftime("%H:%M")}"
+    p_puts ""
   end
 end
 

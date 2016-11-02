@@ -1,5 +1,0 @@
-= schedulr
-
-Generate this with
-    schedulr rdoc
-After you have described your command line interface

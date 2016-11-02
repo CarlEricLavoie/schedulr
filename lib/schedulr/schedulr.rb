@@ -5,27 +5,25 @@ require 'schedulr/activity'
 module Schedulr
 
   def self.initialize_state()
-    # proc used to get current time. Will be changed when reconstructing app state
+    # Value of current time. will be changed when reconstructing state.
     @time_now = Time.now
-    #calendar object
-    @calendar = Calendar.new
     #name of the instance to load
     @instance_name = nil
     #list of all activities
     @activities = Array.new
-    #current activity
-    @current_activity = nil
     #timestamp of the latest event. used to calculate time diff between events.
     @latest_timestamp = nil
     #Identifies if the timer is currently running
     @timer_running = false
+
+    @current_activity = nil
+    @calendar = Calendar.new
   end
 
   def self.load(name)
     initialize_state()
     @instance_name = "#{name}.timesheet"
-    open(@instance_name, 'a')
-    open(@instance_name, 'r+') do |f|
+    open(@instance_name, 'a+') do |f|
       f.each_line do |line|
         load_line(line)
       end
@@ -53,7 +51,7 @@ module Schedulr
   def self.save(command, args)
     log_entry = LogEntry.new(Time.now.to_i, command, args)
     open(@instance_name, 'a') do |f|
-      f.puts log_entry.toLog
+      f.puts log_entry.to_log
     end
   end
 
@@ -74,7 +72,7 @@ module Schedulr
     now = Time.now
     d_end = Time.new(now.year, now.month, now.day)
     d_end = d_end - (1*24*60*60*offset.to_i)
-    @calendar.getDay(d_end)
+    @calendar.day_of(d_end)
   end
 
   def self.get (activity_id)

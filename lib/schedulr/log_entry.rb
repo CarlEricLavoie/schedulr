@@ -4,7 +4,7 @@ class LogEntry
   attr_accessor :cmd
   attr_accessor :args
 
-  def toLog()
+  def to_log()
     "{{#{@date.to_i}}}{{#{@cmd}}}{{#{@args}}}"
   end
 

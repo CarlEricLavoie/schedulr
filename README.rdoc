@@ -1,6 +1,0 @@
-= schedulr
-
-Describe your project here
-
-:include:schedulr.rdoc
-
