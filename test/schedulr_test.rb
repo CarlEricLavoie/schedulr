@@ -92,7 +92,7 @@ describe Schedulr do
       assert_equal 0, Schedulr.day().events.length
     end
 
-    it "returns a Day with 1 event if there were one event today" do
+    it "returns a Day with 1 event if there was one event today" do
       activity = Schedulr.add(@activity_name)
       Schedulr.set(activity.id)
       Schedulr.start()
