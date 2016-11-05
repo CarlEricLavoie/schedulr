@@ -32,6 +32,7 @@ Cucumber::Rake::Task.new('features:wip') do |t|
   t.fork = false
 end
 
+task :test_acceptation => :features
 task :cucumber => :features
 task 'cucumber:wip' => 'features:wip'
 task :wip => 'features:wip'
