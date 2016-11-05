@@ -100,7 +100,7 @@ module Schedulr
 
   def self.stop(save = true)
     save("stop", []) if save
-    computeTime()
+    computeTime() if @timer_running
     @timer_running = false
   end
 
