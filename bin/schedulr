@@ -126,7 +126,7 @@ command :stop do |c|
   end
 end
 
-def display_day (name)
+def display_day (day)
   p_puts "", '-'
   p_puts day.name
   day.events.each do |event|
